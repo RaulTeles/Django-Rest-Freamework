@@ -1,5 +1,7 @@
+from typing import Any
 from django import forms
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 class RegisterForm(forms.ModelForm):
 
@@ -55,6 +57,7 @@ class RegisterForm(forms.ModelForm):
         }
     )
 
+
     class Meta:
         model = User
         fields = ('first_name','last_name','username','email','password')
@@ -64,3 +67,43 @@ class RegisterForm(forms.ModelForm):
         #     'password': {'required': 'This field is Requerid'}
         # }
 
+
+    #Validando campos especificos do formulário
+    def clean_password(self):
+        #pegando o valor do campo
+        data = self.cleaned_data.get('password')
+
+        #validando se existe a palavra especifica no password como teste
+        if 'Atenção' in data:
+            raise ValidationError(
+                'Você não pode digita a palvra %(aleatorio)s no campo password',
+                code='invalid',
+                params={'aleatorio': 'Atenção'}
+                )
+
+        return data
+    
+    def clean_first_name(self):
+        data = self.cleaned_data.get('first_name')
+
+        if 'Ricardo' in data:
+            raise ValidationError(
+                'Você não pode digitar o nome %(primeiro_nome)s',
+                code='invalid',
+                params={'primeiro_nome': 'Ricardo'}
+            )
+
+        return data
+    
+    def clean(self):
+        cleaned_data = super().clean()
+
+        password = cleaned_data.get('password')
+        password2 = cleaned_data.get('password2')
+
+        if password != password2:
+            raise ValidationError({
+                #definido o campo em que irá aparecer o error
+                'password':'Password and password2 must be equal',
+                'password2':'Password and password2 must be equal',
+        })

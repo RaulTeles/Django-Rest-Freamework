@@ -3,7 +3,7 @@ from .forms import RegisterForm
 from django.http import Http404
 
 def register_view(request):
-    #pegando as informações de ssão da view register_create
+    #pegando as informações de sessão da view register_create
     register_form_data = request.session.get('register_form_data', None)
     form = RegisterForm(register_form_data)
 
