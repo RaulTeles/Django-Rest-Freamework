@@ -2,7 +2,13 @@ from typing import Any
 from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
+import re
 
+def strong_password(password):
+    regex = re.compile(r'^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{6,}$')
+
+    if not regex.match(password):
+        raise ValidationError('Type the password strong', code='invalid')
 class RegisterForm(forms.ModelForm):
 
     first_name = forms.CharField(
@@ -43,6 +49,10 @@ class RegisterForm(forms.ModelForm):
         error_messages={
             'required': 'The field must not be empty'
         },
+        help_text=(
+            'The password must have at least 6 characters, including letters uppercase, lowcase and numbers '
+        ),
+        validators=[strong_password]
     )
 
     password2 = forms.CharField(
